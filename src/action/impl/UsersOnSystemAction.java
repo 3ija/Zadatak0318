@@ -23,11 +23,9 @@ public class UsersOnSystemAction extends AbstractAction {
 		
 	
 		
-		List<User> list = SessionManager.getActive2();
+		request.setAttribute("users", SessionManager.getActive());
 		
-		list.forEach((e) -> System.out.println(e));
-		
-		request.setAttribute("users", SessionManager.getActive2());
+		//request.setAttribute("users", SessionManager.getActive2());
 		
 		return ViewConstants.USERS_ON_SYSTEM;
 		

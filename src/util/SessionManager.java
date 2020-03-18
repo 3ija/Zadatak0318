@@ -3,6 +3,8 @@ package util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +22,9 @@ public class SessionManager {
 	public static boolean authentication(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Boolean valid = (Boolean) session.getAttribute("login");
+		if(session.getAttribute("user") == null) {
+			valid = false;
+		}
 		if (valid == null) {
 			return false;
 		}
@@ -49,7 +54,7 @@ public class SessionManager {
 	public static boolean init(User user, HttpServletRequest request) {
 		HttpSession session = request.getSession(true);
 		sessions.put(++counter, session);
-		session.setAttribute("counter", ++counter);
+		session.setAttribute("counter", counter);
 		session.setAttribute("login", true);
 		session.setAttribute("user", user);
 		for (User us : UsersRepository.getUsers()) {
@@ -61,11 +66,22 @@ public class SessionManager {
 		return true;
 	}
 
-	/*
-	 * public static List<User> getActive(){ active.clear(); sessions.forEach((lo,
-	 * session) -> { try { User temp = (User) session.getAttribute("user"); if(temp
-	 * != null) active.add(temp); } catch(Exception e) { } } ); return active; }
-	 */
+	public static List<User> getActive() {
+		List<User> active = new ArrayList<User>();
+		for (Entry<Long, HttpSession> pair : sessions.entrySet()) {
+			HttpSession sesija = pair.getValue();
+			if (sesija != null) {
+				try {
+					active.add((User) sesija.getAttribute("user"));
+				} catch (Exception e) {
+
+				}
+			}
+		}
+		System.out.println("Trenutno sesija u manageru " + sessions.size());
+		return active;
+	}
+
 	public static List<User> getActive2() {
 		List<User> users = UsersRepository.getUsers();
 		List<User> ret = new ArrayList<User>();
